@@ -167,7 +167,7 @@ To apply a filter on a section of code, wrap it with the
 .. code-block:: jinja
 
     {% filter upper %}
-      This text becomes uppercase
+        This text becomes uppercase
     {% endfilter %}
 
 Go to the :doc:`filters<filters/index>` page to learn more about the built-in
@@ -191,18 +191,11 @@ progression of integers:
 Go to the :doc:`functions<functions/index>` page to learn more about the
 built-in functions.
 
-.. _named_arguments:
-
 Named Arguments
 ---------------
 
 .. versionadded:: 1.12
     Support for named arguments was added in Twig 1.12.
-
-.. versionadded:: 1.14
-    Support for named arguments for macros was added in Twig 1.14.
-
-Arguments for filters, functions and macros can also be passed as *named arguments*:
 
 .. code-block:: jinja
 
@@ -503,10 +496,6 @@ Macros
 .. versionadded:: 1.12
     Support for default argument values was added in Twig 1.12.
 
-.. versionadded:: 1.14
-    Support for macro call with named arguments was added in Twig 1.14.
-    Support for directly call macros defined in the same template was added in Twig 1.14.
-
 Macros are comparable with functions in regular programming languages. They
 are useful to reuse often used HTML fragments to not repeat yourself.
 
@@ -527,21 +516,6 @@ Macros can be defined in any template, and need to be "imported" via the
     {% import "forms.html" as forms %}
 
     <p>{{ forms.input('username') }}</p>
-
-Macros defined in the same template can be directly called:
-
-.. code-block:: jinja
-
-    {% macro submit(name) %}
-        <input type="submit" value="{{ name }}" />
-    {% endmacro %}
-
-    <p>{{ submit('Send') }}</p>
-
-.. note::
-
-    If the macro name matches the name of a function, it need to be "imported"
-    via the :doc:`import<tags/import>`.
 
 Alternatively, you can import individual macro names from a template into the
 current namespace via the :doc:`from<tags/from>` tag and optionally alias them:
@@ -566,14 +540,6 @@ macro call:
         <input type="{{ type }}" name="{{ name }}" value="{{ value|e }}" size="{{ size }}" />
     {% endmacro %}
 
-Arguments for macro can also be passed as :ref:`named arguments<named_arguments>`:
-
-.. code-block:: jinja
-
-    {% import "forms.html" as forms %}
-
-    <p>{{ forms.input(name='username', size=40) }}</p>
-
 .. _twig-expressions:
 
 Expressions
@@ -586,9 +552,9 @@ even if you're not working with PHP you should feel comfortable with it.
 
     The operator precedence is as follows, with the lowest-precedence
     operators listed first: ``b-and``, ``b-xor``, ``b-or``, ``or``, ``and``,
-    ``==``, ``!=``, ``<``, ``>``, ``>=``, ``<=``, ``in``, ``..``, ``+``,
-    ``-``, ``~``, ``*``, ``/``, ``//``, ``%``, ``is``, ``**``, ``|``, ``[]``,
-    and ``.``:
+    ``==``, ``!=``, ``<``, ``>``, ``>=``, ``<=``, ``in``, ``matches``,
+    ``starts with``, ``ends with``, ``..``, ``+``, ``-``, ``~``, ``*``, ``/``,
+    ``//``, ``%``, ``is``, ``**``, ``|``, ``[]``, and ``.``:
 
     .. code-block:: jinja
 
@@ -707,6 +673,27 @@ Comparisons
 The following comparison operators are supported in any expression: ``==``,
 ``!=``, ``<``, ``>``, ``>=``, and ``<=``.
 
+You can also check if a string ``starts with`` or ``ends with`` another
+string:
+
+.. code-block:: jinja
+
+    {% if 'Fabien' starts with 'F' %}
+    {% endif %}
+
+    {% if 'Fabien' ends with 'n' %}
+    {% endif %}
+
+.. note::
+
+    For complex string comparisons, the ``matches`` operator allows you to use
+    `regular expressions`_:
+
+    .. code-block:: jinja
+
+        {% if phone matches '{^[\d\.]+$}' %}
+        {% endif %}
+
 Containment Operator
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -794,8 +781,8 @@ categories:
       {{ foo ? 'yes' : 'no' }}
 
       {# as of Twig 1.12.0 #}
-      {{ foo ?: 'no' }} == {{ foo ? foo : 'no' }}
-      {{ foo ? 'yes' }} == {{ foo ? 'yes' : '' }}
+      {{ foo ?: 'no' }} is the same as {{ foo ? foo : 'no' }}
+      {{ foo ? 'yes' }} is the same as {{ foo ? 'yes' : '' }}
 
 String Interpolation
 ~~~~~~~~~~~~~~~~~~~~
@@ -882,3 +869,4 @@ Extension<creating_extensions>` chapter.
 .. _`other Twig syntax mode`:     https://github.com/muxx/Twig-HTML.mode
 .. _`Notepad++ Twig Highlighter`: https://github.com/Banane9/notepadplusplus-twig
 .. _`web-mode.el`:                http://web-mode.org/
+.. _`regular expressions`:        http://php.net/manual/en/pcre.pattern.php
