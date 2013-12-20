@@ -55,7 +55,7 @@ interface Twig_LoaderInterface
      *
      * @param string $name The name of the template to check if we can load
      *
-     * @return boolean If the template source code is handled by this loader or not
+     * @return Boolean If the template source code is handled by this loader or not
      */
     public function exists($name);
 }
