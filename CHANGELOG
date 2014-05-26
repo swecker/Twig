@@ -4,9 +4,17 @@
  * improved the performance of the filesystem loader
  * removed features that were deprecated in 1.x
 
-* 1.15.1 (2013-XX-XX)
+* 1.15.2 (2014-XX-XX)
 
+ * fixed inheritance in a 'use'-hierarchy
+ * removed the __toString policy check when the sandbox is disabled
+ * fixed recursively calling blocks in templates with inheritance
+
+* 1.15.1 (2014-02-13)
+
+ * fixed the conversion of the special '0000-00-00 00:00' date
  * added an error message when trying to import an undefined block from a trait
+ * fixed a C extension crash when accessing defined but uninitialized property.
 
 * 1.15.0 (2013-12-06)
 

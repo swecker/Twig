@@ -95,7 +95,7 @@ class Twig_Extension_Core extends Twig_Extension
     /**
      * Sets the default format to be used by the number_format filter.
      *
-     * @param integer $decimal      The number of decimal places to use.
+     * @param int     $decimal      The number of decimal places to use.
      * @param string  $decimalPoint The character(s) to use for the decimal point.
      * @param string  $thousandSep  The character(s) to use for the thousands separator.
      */
@@ -353,7 +353,7 @@ class Twig_Extension_Core extends Twig_Extension
  * Cycles over a value.
  *
  * @param ArrayAccess|array $values   An array or an ArrayAccess instance
- * @param integer           $position The cycle position
+ * @param int               $position The cycle position
  *
  * @return string The next value in the cycle
  */
@@ -373,7 +373,7 @@ function twig_cycle($values, $position)
  * - a random integer between 0 and the integer parameter
  *
  * @param Twig_Environment                 $env    A Twig_Environment instance
- * @param Traversable|array|integer|string $values The values to pick a random item from
+ * @param Traversable|array|int|string     $values The values to pick a random item from
  *
  * @throws Twig_Error_Runtime When $values is an empty array (does not apply to an empty string which is returned as is).
  *
@@ -389,7 +389,7 @@ function twig_random(Twig_Environment $env, $values = null)
         return $values < 0 ? mt_rand($values, 0) : mt_rand(0, $values);
     }
 
-    if (is_object($values) && $values instanceof Traversable) {
+    if ($values instanceof Traversable) {
         $values = iterator_to_array($values);
     } elseif (is_string($values)) {
         if ('' === $values) {
@@ -500,15 +500,18 @@ function twig_date_converter(Twig_Environment $env, $date = null, $timezone = nu
         $defaultTimezone = $timezone;
     }
 
+    // immutable dates
+    if ($date instanceof DateTimeImmutable) {
+        return false !== $timezone ? $date->setTimezone($defaultTimezone) : $date;
+    }
+
     if ($date instanceof DateTime || $date instanceof DateTimeInterface) {
-        $returningDate = new DateTime($date->format('c'));
+        $date = clone $date;
         if (false !== $timezone) {
-            $returningDate->setTimezone($defaultTimezone);
-        } else {
-            $returningDate->setTimezone($date->getTimezone());
+            $date->setTimezone($defaultTimezone);
         }
 
-        return $returningDate;
+        return $date;
     }
 
     $asString = (string) $date;
@@ -527,11 +530,11 @@ function twig_date_converter(Twig_Environment $env, $date = null, $timezone = nu
 /**
  * Rounds a number.
  *
- * @param integer|float $value     The value to round
- * @param integer|float $precision The rounding precision
+ * @param int|float     $value     The value to round
+ * @param int|float     $precision The rounding precision
  * @param string        $method    The method to use for rounding
  *
- * @return integer|float The rounded number
+ * @return int|float     The rounded number
  */
 function twig_round($value, $precision = 0, $method = 'common')
 {
@@ -555,7 +558,7 @@ function twig_round($value, $precision = 0, $method = 'common')
  *
  * @param Twig_Environment    $env          A Twig_Environment instance
  * @param mixed               $number       A float/int/string of the number to format
- * @param integer             $decimal      The number of decimal points to display.
+ * @param int                 $decimal      The number of decimal points to display.
  * @param string              $decimalPoint The character(s) to use for the decimal point.
  * @param string              $thousandSep  The character(s) to use for the thousands separator.
  *
@@ -583,7 +586,7 @@ function twig_number_format_filter(Twig_Environment $env, $number, $decimal = nu
  * URL encodes a string as a path segment or an array as a query string.
  *
  * @param string|array $url A URL or an array of query parameters
- * @param Boolean      $raw true to use rawurlencode() instead of urlencode
+ * @param bool         $raw true to use rawurlencode() instead of urlencode
  *
  * @return string The URL encoded value
  */
@@ -605,7 +608,7 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
      * JSON encodes a variable.
      *
      * @param mixed   $value   The value to encode.
-     * @param integer $options Not used on PHP 5.2.x
+     * @param int     $options Not used on PHP 5.2.x
      *
      * @return mixed The JSON encoded value
      */
@@ -624,7 +627,7 @@ if (version_compare(PHP_VERSION, '5.3.0', '<')) {
      * JSON encodes a variable.
      *
      * @param mixed   $value   The value to encode.
-     * @param integer $options Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT
+     * @param int     $options Bitmask consisting of JSON_HEX_QUOT, JSON_HEX_TAG, JSON_HEX_AMP, JSON_HEX_APOS, JSON_NUMERIC_CHECK, JSON_PRETTY_PRINT, JSON_UNESCAPED_SLASHES, JSON_FORCE_OBJECT
      *
      * @return mixed The JSON encoded value
      */
@@ -677,15 +680,15 @@ function twig_array_merge($arr1, $arr2)
  *
  * @param Twig_Environment $env          A Twig_Environment instance
  * @param mixed            $item         A variable
- * @param integer          $start        Start of the slice
- * @param integer          $length       Size of the slice
- * @param Boolean          $preserveKeys Whether to preserve key or not (when the input is an array)
+ * @param int              $start        Start of the slice
+ * @param int              $length       Size of the slice
+ * @param bool             $preserveKeys Whether to preserve key or not (when the input is an array)
  *
  * @return mixed The sliced variable
  */
 function twig_slice(Twig_Environment $env, $item, $start, $length = null, $preserveKeys = false)
 {
-    if (is_object($item) && $item instanceof Traversable) {
+    if ($item instanceof Traversable) {
         $item = iterator_to_array($item, false);
     }
 
@@ -752,7 +755,7 @@ function twig_last(Twig_Environment $env, $item)
  */
 function twig_join_filter($value, $glue = '')
 {
-    if (is_object($value) && $value instanceof Traversable) {
+    if ($value instanceof Traversable) {
         $value = iterator_to_array($value, false);
     }
 
@@ -778,7 +781,7 @@ function twig_join_filter($value, $glue = '')
  *
  * @param string  $value     A string
  * @param string  $delimiter The delimiter
- * @param integer $limit     The limit
+ * @param int     $limit     The limit
  *
  * @return array The split string as an array
  */
@@ -836,7 +839,7 @@ function twig_get_array_keys_filter($array)
  *
  * @param Twig_Environment         $env          A Twig_Environment instance
  * @param array|Traversable|string $item         An array, a Traversable instance, or a string
- * @param Boolean                  $preserveKeys Whether to preserve key or not
+ * @param bool                     $preserveKeys Whether to preserve key or not
  *
  * @return mixed The reversed input
  */
@@ -894,7 +897,7 @@ function twig_in_filter($value, $compare)
         }
 
         return false !== strpos($compare, (string) $value);
-    } elseif (is_object($compare) && $compare instanceof Traversable) {
+    } elseif ($compare instanceof Traversable) {
         return in_array($value, iterator_to_array($compare, false), is_object($value));
     }
 
@@ -908,7 +911,7 @@ function twig_in_filter($value, $compare)
  * @param string           $string     The value to be escaped
  * @param string           $strategy   The escaping strategy
  * @param string           $charset    The charset
- * @param Boolean          $autoescape Whether the function is called by the auto-escaping feature (true) or by the developer (false)
+ * @param bool             $autoescape Whether the function is called by the auto-escaping feature (true) or by the developer (false)
  */
 function twig_escape_filter(Twig_Environment $env, $string, $strategy = 'html', $charset = null, $autoescape = false)
 {
@@ -1185,7 +1188,7 @@ if (function_exists('mb_get_info')) {
      * @param Twig_Environment $env   A Twig_Environment instance
      * @param mixed            $thing A variable
      *
-     * @return integer The length of the value
+     * @return int     The length of the value
      */
     function twig_length_filter(Twig_Environment $env, $thing)
     {
@@ -1269,7 +1272,7 @@ else {
      * @param Twig_Environment $env   A Twig_Environment instance
      * @param mixed            $thing A variable
      *
-     * @return integer The length of the value
+     * @return int     The length of the value
      */
     function twig_length_filter(Twig_Environment $env, $thing)
     {
@@ -1325,7 +1328,7 @@ function twig_ensure_traversable($seq)
  *
  * @param mixed $value A variable
  *
- * @return Boolean true if the value is empty, false otherwise
+ * @return bool    true if the value is empty, false otherwise
  */
 function twig_test_empty($value)
 {
@@ -1348,7 +1351,7 @@ function twig_test_empty($value)
  *
  * @param mixed $value A variable
  *
- * @return Boolean true if the value is traversable
+ * @return bool    true if the value is traversable
  */
 function twig_test_iterable($value)
 {
@@ -1360,14 +1363,16 @@ function twig_test_iterable($value)
  *
  * @param string|array $template       The template to render or an array of templates to try consecutively
  * @param array        $variables      The variables to pass to the template
- * @param Boolean      $with_context   Whether to pass the current context variables or not
- * @param Boolean      $ignore_missing Whether to ignore missing templates or not
- * @param Boolean      $sandboxed      Whether to sandbox the template or not
+ * @param bool         $with_context   Whether to pass the current context variables or not
+ * @param bool         $ignore_missing Whether to ignore missing templates or not
+ * @param bool         $sandboxed      Whether to sandbox the template or not
  *
  * @return string The rendered template
  */
 function twig_include(Twig_Environment $env, $context, $template, $variables = array(), $withContext = true, $ignoreMissing = false, $sandboxed = false)
 {
+    $alreadySandboxed = false;
+    $sandbox = null;
     if ($withContext) {
         $variables = array_merge($context, $variables);
     }
@@ -1425,14 +1430,14 @@ function twig_constant($constant, $object = null)
  * Batches item.
  *
  * @param array   $items An array of items
- * @param integer $size  The size of the batch
+ * @param int     $size  The size of the batch
  * @param mixed   $fill  A value used to fill missing items
  *
  * @return array
  */
 function twig_array_batch($items, $size, $fill = null)
 {
-    if (is_object($items) && $items instanceof Traversable) {
+    if ($items instanceof Traversable) {
         $items = iterator_to_array($items, false);
     }
 
